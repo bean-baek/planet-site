@@ -70,8 +70,8 @@ export function captureAtmosphere(scene, bloomPass, ambientLight) {
 const LANDSCAPE_SKY = new THREE.Color("#5a8a9a");
 const LANDSCAPE_FOG_NEAR = 8;
 const LANDSCAPE_FOG_FAR = 50;
-const LANDSCAPE_BLOOM_STRENGTH = 0.2;
-const LANDSCAPE_AMBIENT_INTENSITY = 3;
+const LANDSCAPE_BLOOM_STRENGTH = 0.15;
+const LANDSCAPE_AMBIENT_INTENSITY = 1.4; // 1.2 -> 1.4 초미세 상향
 
 /**
  * Call every frame with the current camera distance.

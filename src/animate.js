@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { composer, bloomPass } from "./composer.js";
-import { controls, setControlsMode } from "./controls.js";
+import { controls, setControlsMode, updateCameraMovement } from "./controls.js";
 import { renderer, scene, camera } from "./scene.js";
 import {
   update as updateState,
@@ -14,7 +14,9 @@ import {
   ORBITAL,
   LANDSCAPE,
 } from "./sceneState.js";
-import { createLandscape, getLandscape } from "./landscape.js";
+import { createLandscape, getLandscape, updateLandscape } from "./landscape.js";
+import { updateMist } from "./mist.js";
+import { updateSpores } from "./spores.js";
 import { updateOverlay } from "./ui.js";
 
 let lastTime = performance.now();
@@ -36,7 +38,7 @@ scene.traverse((obj) => {
 let prevState = ORBITAL;
 let landscapeCreated = false;
 
-export function animate(planet, rings, stars, glitter, bubbles, flowers, petals, astrophage) {
+export function animate(planet, rings, stars, glitter, bubbles, flowers, petals, astrophage, mist, spores, landscapeLights) {
   // Capture base values on first call (before any transition)
   captureBaseOpacities(planet, rings, stars, glitter, bubbles, flowers, petals);
   captureAtmosphere(scene, bloomPass, ambientLight);
@@ -72,18 +74,33 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
       // Fade orbital objects
       applyTransitionFade(planet, rings, stars, glitter, bubbles, flowers, petals);
 
-      // Landscape visibility: fade in opposite to orbital
+      // Landscape visibility & Lighting Sync
       const landscape = getLandscape();
       if (landscape) {
-        // [수정] 0.9부터 비치기 시작하여 1.0에 선명해짐
         const landscapeAlpha = THREE.MathUtils.smoothstep(progress, 0.9, 1.0);
         landscape.visible = landscapeAlpha > 0;
         landscape.material.opacity = landscapeAlpha;
         landscape.material.transparent = landscapeAlpha < 1;
+        
+        // [최적화] 시선 추적 조명 동기화 (카메라에 부착됨)
+        if (landscapeLights) {
+          landscapeLights.visible = landscapeAlpha > 0;
+          
+          landscapeLights.children.forEach(light => {
+            if (light.isDirectionalLight) {
+              const hex = light.color.getHex();
+              const baseInt = (hex === 0xffffff) ? 0.4 : (hex === 0xe8d6ff ? 0.3 : 0.4);
+              light.intensity = baseInt * landscapeAlpha;
+            }
+          });
+        }
       }
 
       // Atmosphere interpolation
       applyAtmosphere(scene, bloomPass, ambientLight);
+      
+      updateMist(delta, progress);
+      updateSpores(spores, delta, progress);
     } else {
       // Fully orbital — restore everything exactly
       applyTransitionFade(planet, rings, stars, glitter, bubbles, flowers, petals);
@@ -91,6 +108,9 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
 
       const landscape = getLandscape();
       if (landscape) landscape.visible = false;
+      if (mist) mist.visible = false;
+      if (spores) spores.visible = false;
+      if (landscapeLights) landscapeLights.visible = false;
     }
 
     // --- UI overlay ---
@@ -132,8 +152,18 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
         }
       }
     } else {
-      // 3. 지표면(Landscape) 전용 업데이트 (필요 시)
+      // 3. 지표면(Landscape) 전용 업데이트
       if (astrophage) astrophage.visible = false;
+      
+      // [탐험 시스템] 키보드 이동 실행
+      updateCameraMovement(delta);
+      
+      // [핵심] 조명은 이미 카메라 자식이므로 가시성만 보장
+      if (landscapeLights) landscapeLights.visible = true;
+
+      updateLandscape(delta);
+      updateMist(delta, progress);
+      updateSpores(spores, delta, progress);
     }
 
     controls.update();
