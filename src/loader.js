@@ -6,13 +6,23 @@ export function loadTextures() {
     const textures = {};
     let loaded = 0;
 
-    const onLoad = (key) => (texture) => {
+    const paths = [
+      ["/ring.png", "ringTexture", true],
+      ["/model/sphere/sphere-albedo.webp", "sphereAlbedo", true],
+      ["/model/sphere/sphere-normal.webp", "sphereNormal", false],
+      ["/model/sphere/sphere-roughness.webp", "sphereRoughness", false],
+    ];
+    const total = paths.length;
+
+    const onLoad = (key, sRGB) => (texture) => {
+      if (sRGB) texture.colorSpace = THREE.SRGBColorSpace;
       textures[key] = texture;
       loaded++;
-      if (loaded === 2) resolve(textures);
+      if (loaded === total) resolve(textures);
     };
 
-    loader.load("/mapping.png", onLoad("planetTexture"), undefined, reject);
-    loader.load("/ring.png", onLoad("ringTexture"), undefined, reject);
+    paths.forEach(([url, key, sRGB]) =>
+      loader.load(url, onLoad(key, sRGB), undefined, reject),
+    );
   });
 }

@@ -1,6 +1,7 @@
 const loaderEl = document.getElementById("loader");
 const titleGroup = document.getElementById("title-group");
 const hintText = document.getElementById("hint-text");
+const landscapeHint = document.getElementById("landscape-hint");
 
 export function showScene() {
   // Hide spinner
@@ -15,4 +16,22 @@ export function showScene() {
   setTimeout(() => {
     hintText.classList.add("dismissed");
   }, 5000);
+}
+
+/**
+ * Called from animate loop with current transition progress (0..1).
+ * Fades title out as we enter landscape, shows landscape hint when arrived.
+ */
+export function updateOverlay(progress) {
+  if (progress > 0.05) {
+    titleGroup.classList.add("fading");
+  } else {
+    titleGroup.classList.remove("fading");
+  }
+
+  if (progress > 0.95) {
+    landscapeHint.classList.add("visible");
+  } else {
+    landscapeHint.classList.remove("visible");
+  }
 }

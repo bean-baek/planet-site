@@ -1,20 +1,29 @@
 import * as THREE from "three";
 
-export function createPlanet(planetTexture) {
-  const geo = new THREE.IcosahedronGeometry(1, 20);
+export function createPlanet({ sphereAlbedo, sphereNormal, sphereRoughness }) {
+  const geo = new THREE.SphereGeometry(1, 64, 64);
   const mat = new THREE.MeshPhysicalMaterial({
-    map: planetTexture,
-    roughness: 0.05,
-    metalness: 0.05,
-    transmission: 0.1,
-    thickness: 0.5,
-    iridescence: 1.0,
+    map: sphereAlbedo,
+    normalMap: sphereNormal,
+    normalScale: new THREE.Vector2(0.08, 0.08),
+    roughnessMap: sphereRoughness,
+    roughness: 0.55,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.95,
+    transmission: 0.15,
+    iridescence: 1,
     iridescenceIOR: 1.3,
-    iridescenceThicknessRange: [100, 500],
-    ior: 1.5,
-    specularIntensity: 1.8,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
+    iridescenceThicknessRange: [100, 800],
   });
+
   return new THREE.Mesh(geo, mat);
+}
+
+export function disposePlanet(planet) {
+  planet.geometry.dispose();
+  if (planet.material.map) planet.material.map.dispose();
+  if (planet.material.normalMap) planet.material.normalMap.dispose();
+  if (planet.material.roughnessMap) planet.material.roughnessMap.dispose();
+  planet.material.dispose();
 }

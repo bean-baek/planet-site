@@ -142,6 +142,33 @@ body {
   transition: opacity 1.5s ease !important;
 }
 
+/* --- Landscape hint (bottom-center) --- */
+#landscape-hint {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  opacity: 0;
+  transition: opacity var(--duration-fade) ease;
+  pointer-events: none;
+}
+
+#landscape-hint.visible {
+  opacity: 1;
+}
+
+/* Title group fading */
+#title-group.fading {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .loader-ring {
     animation: none;

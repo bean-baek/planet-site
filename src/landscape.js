@@ -1,0 +1,137 @@
+import * as THREE from "three";
+
+let terrain = null;
+let disposed = false;
+
+// Simple 2D noise using sine layers (no external lib needed)
+function layeredNoise(x, y) {
+  let v = 0;
+  v += Math.sin(x * 1.2 + y * 0.8) * 0.5;
+  v += Math.sin(x * 2.5 - y * 1.7 + 1.3) * 0.25;
+  v += Math.sin(x * 5.1 + y * 4.3 + 2.7) * 0.125;
+  v += Math.sin(x * 10.3 - y * 8.7 + 5.1) * 0.0625;
+  return v;
+}
+
+function generateHeightmap(size) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const imageData = ctx.createImageData(size, size);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const nx = x / size * 6;
+      const ny = y / size * 6;
+      const v = (layeredNoise(nx, ny) + 1) * 0.5; // 0..1
+      const byte = Math.floor(v * 255);
+      const idx = (y * size + x) * 4;
+      imageData.data[idx] = byte;
+      imageData.data[idx + 1] = byte;
+      imageData.data[idx + 2] = byte;
+      imageData.data[idx + 3] = 255;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
+
+// Pastel colors derived from the orbital palette
+const TERRAIN_COLORS = [
+  [0.85, 0.75, 0.80], // rose
+  [0.80, 0.82, 0.88], // periwinkle
+  [0.85, 0.80, 0.72], // cream
+  [0.78, 0.85, 0.82], // mint
+  [0.82, 0.78, 0.85], // lavender
+];
+
+function generateColorMap(size, heightmap) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const imageData = ctx.createImageData(size, size);
+
+  // Read heightmap canvas to get height values
+  const hCtx = heightmap.image.getContext("2d");
+  const hData = hCtx.getImageData(0, 0, size, size);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const idx = (y * size + x) * 4;
+      const h = hData.data[idx] / 255; // 0..1
+
+      // Pick color band by height
+      const bandIdx = Math.min(
+        Math.floor(h * TERRAIN_COLORS.length),
+        TERRAIN_COLORS.length - 1,
+      );
+      const c = TERRAIN_COLORS[bandIdx];
+
+      // Add slight variation
+      const vary = (layeredNoise(x / size * 12, y / size * 12) * 0.05);
+
+      imageData.data[idx] = Math.floor(Math.max(0, Math.min(1, c[0] + vary)) * 255);
+      imageData.data[idx + 1] = Math.floor(Math.max(0, Math.min(1, c[1] + vary)) * 255);
+      imageData.data[idx + 2] = Math.floor(Math.max(0, Math.min(1, c[2] + vary)) * 255);
+      imageData.data[idx + 3] = 255;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
+
+/**
+ * Create the landscape terrain mesh. Lazy — call once on first transition.
+ * Returns the mesh (already added to the provided scene).
+ */
+export function createLandscape(scene) {
+  if (terrain) return terrain;
+
+  const SIZE = 512;
+  const heightmap = generateHeightmap(SIZE);
+  const colorMap = generateColorMap(SIZE, heightmap);
+
+  const geo = new THREE.PlaneGeometry(20, 20, 256, 256);
+  geo.rotateX(-Math.PI / 2);
+
+  const mat = new THREE.MeshStandardMaterial({
+    map: colorMap,
+    displacementMap: heightmap,
+    displacementScale: 0.8,
+    roughness: 0.85,
+    metalness: 0.05,
+    side: THREE.DoubleSide,
+    fog: true,
+  });
+
+  terrain = new THREE.Mesh(geo, mat);
+  terrain.visible = false;
+  terrain.position.y = -0.5; // sit slightly below origin so camera looks across
+  scene.add(terrain);
+
+  return terrain;
+}
+
+export function getLandscape() {
+  return terrain;
+}
+
+export function disposeLandscape() {
+  if (!terrain || disposed) return;
+  disposed = true;
+  terrain.geometry.dispose();
+  if (terrain.material.map) terrain.material.map.dispose();
+  if (terrain.material.displacementMap) terrain.material.displacementMap.dispose();
+  terrain.material.dispose();
+}
