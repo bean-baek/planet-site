@@ -4,7 +4,7 @@ An interactive 3D planet visualization built with Three.js, featuring two distin
 
 ## Demo
 
-> Live at: https://bean-baek.github.io/planet-site/ *(if deployed)*
+> Live at: 
 
 ## Features
 
