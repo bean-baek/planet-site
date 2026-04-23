@@ -19,17 +19,16 @@ import { updateMist } from "./mist.js";
 import { updateSpores } from "./spores.js";
 import { updateOverlay } from "./ui.js";
 
-let lastTime = performance.now();
-export let rafId = null;
+let lastTime = 0;
+let rafId = null;
 
 // Rotation speeds in radians/second (framerate-independent)
 const PLANET_ROT_Y = 0.3;
 const STARS_ROT_Y = 0.03;
 
-const RING_BASE_ROT_Z = 0.3; // 링의 기본 회전 속도
+const RING_BASE_ROT_Z = 0.3;
 const RING_PARALLAX_STEP = 0.006;
 
-// Find the ambient light in the scene (added in scene.js)
 let ambientLight = null;
 scene.traverse((obj) => {
   if (obj.isAmbientLight && !ambientLight) ambientLight = obj;
@@ -37,9 +36,28 @@ scene.traverse((obj) => {
 
 let prevState = ORBITAL;
 let landscapeCreated = false;
+let maxZoomFired = false;
 
-export function animate(planet, rings, stars, glitter, bubbles, flowers, petals, astrophage, mist, spores, landscapeLights) {
-  // Capture base values on first call (before any transition)
+export function animate(
+  planet,
+  rings,
+  stars,
+  glitter,
+  bubbles,
+  flowers,
+  petals,
+  astrophage,
+  mist,
+  spores,
+  landscapeLights,
+  onMaxZoom,
+) {
+  // Reset per-session state so re-entry after returnToBlueprint is clean
+  lastTime = performance.now();
+  landscapeCreated = false;
+  maxZoomFired = false;
+  prevState = ORBITAL;
+
   captureBaseOpacities(planet, rings, stars, glitter, bubbles, flowers, petals);
   captureAtmosphere(scene, bloomPass, ambientLight);
 
@@ -63,6 +81,13 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
     const state = getState();
     const progress = getProgress();
 
+    // Max zoom-out → return to blueprint
+    if (state === ORBITAL && camDist >= controls.maxDistance * 0.96) {
+      if (!maxZoomFired) { maxZoomFired = true; onMaxZoom?.(); }
+    } else {
+      maxZoomFired = false;
+    }
+
     // --- Transition handling ---
     if (progress > 0) {
       // Lazy-create landscape on first transition
@@ -72,7 +97,15 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
       }
 
       // Fade orbital objects
-      applyTransitionFade(planet, rings, stars, glitter, bubbles, flowers, petals);
+      applyTransitionFade(
+        planet,
+        rings,
+        stars,
+        glitter,
+        bubbles,
+        flowers,
+        petals,
+      );
 
       // Landscape visibility & Lighting Sync
       const landscape = getLandscape();
@@ -81,16 +114,14 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
         landscape.visible = landscapeAlpha > 0;
         landscape.material.opacity = landscapeAlpha;
         landscape.material.transparent = landscapeAlpha < 1;
-        
+
         // [최적화] 시선 추적 조명 동기화 (카메라에 부착됨)
         if (landscapeLights) {
           landscapeLights.visible = landscapeAlpha > 0;
-          
-          landscapeLights.children.forEach(light => {
+
+          landscapeLights.children.forEach((light) => {
             if (light.isDirectionalLight) {
-              const hex = light.color.getHex();
-              const baseInt = (hex === 0xffffff) ? 0.4 : (hex === 0xe8d6ff ? 0.3 : 0.4);
-              light.intensity = baseInt * landscapeAlpha;
+              light.intensity = light.userData.baseIntensity * landscapeAlpha;
             }
           });
         }
@@ -98,12 +129,20 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
 
       // Atmosphere interpolation
       applyAtmosphere(scene, bloomPass, ambientLight);
-      
+
       updateMist(delta, progress);
       updateSpores(spores, delta, progress);
     } else {
       // Fully orbital — restore everything exactly
-      applyTransitionFade(planet, rings, stars, glitter, bubbles, flowers, petals);
+      applyTransitionFade(
+        planet,
+        rings,
+        stars,
+        glitter,
+        bubbles,
+        flowers,
+        petals,
+      );
       restoreAtmosphere(scene, bloomPass, ambientLight);
 
       const landscape = getLandscape();
@@ -154,16 +193,14 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
     } else {
       // 3. 지표면(Landscape) 전용 업데이트
       if (astrophage) astrophage.visible = false;
-      
+
       // [탐험 시스템] 키보드 이동 실행
       updateCameraMovement(delta);
-      
+
       // [핵심] 조명은 이미 카메라 자식이므로 가시성만 보장
       if (landscapeLights) landscapeLights.visible = true;
 
       updateLandscape(delta);
-      updateMist(delta, progress);
-      updateSpores(spores, delta, progress);
     }
 
     controls.update();
@@ -171,4 +208,8 @@ export function animate(planet, rings, stars, glitter, bubbles, flowers, petals,
   }
 
   rafId = requestAnimationFrame(loop);
+}
+
+export function cancelAnimation() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 }

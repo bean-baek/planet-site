@@ -3,11 +3,6 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
-// 💡 새롭게 추가할 패스와 셰이더들 Import
-import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
-import { HueSaturationShader } from "three/addons/shaders/HueSaturationShader.js";
-import { BrightnessContrastShader } from "three/addons/shaders/BrightnessContrastShader.js";
-
 import { renderer, scene, camera } from "./scene.js";
 
 export const bloomPass = new UnrealBloomPass(
@@ -32,8 +27,6 @@ composer.addPass(bloomPass);
 export function resizeComposer(w, h) {
   composer.setSize(w, h);
   bloomPass.setSize(w, h);
-  // ShaderPass들은 내부적으로 해상도(resolution)를 크게 타지 않아서
-  // 별도로 setSize를 해주지 않아도 괜찮습니다.
 }
 
 export function disposeComposer() {

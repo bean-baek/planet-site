@@ -112,7 +112,6 @@ export function createLandscape(scene) {
     iridescence: 0.5,
     iridescenceIOR: 1.3,
     clearcoat: 0.3,
-    // [초미세 조정] 0.02 -> 0.05
     emissive: new THREE.Color("#ffffff"),
     emissiveMap: colorMap,
     emissiveIntensity: 0.05,
@@ -150,33 +149,25 @@ export function updateLandscape(delta) {
 export function createLandscapeLights() {
   const group = new THREE.Group();
 
-  // 1. 카메라 바로 위에서 수직으로 내리는 화이트 광원
   const topLight = new THREE.DirectionalLight("#ffffff", 0.4);
-  topLight.position.set(0, 100, 0); 
+  topLight.userData.baseIntensity = 0.4;
+  topLight.position.set(0, 150, 0);
   group.add(topLight);
-  group.add(topLight.target);
-  topLight.target.position.set(0, 0, 0); // 카메라 중심을 비춤
 
-  // 2. 카메라 우측 상단 뒤쪽에서 오는 핑크빛
   const pinkWash = new THREE.DirectionalLight("#ffccff", 0.4);
-  pinkWash.position.set(50, 50, 50);
+  pinkWash.userData.baseIntensity = 0.4;
+  pinkWash.position.set(100, 100, 50);
   group.add(pinkWash);
-  group.add(pinkWash.target);
-  pinkWash.target.position.set(0, 0, 0);
 
-  // 3. 카메라 좌측 상단 뒤쪽에서 오는 청록빛
   const cyanWash = new THREE.DirectionalLight("#ccffff", 0.4);
-  cyanWash.position.set(-50, 50, 50);
+  cyanWash.userData.baseIntensity = 0.4;
+  cyanWash.position.set(-100, 100, 50);
   group.add(cyanWash);
-  group.add(cyanWash.target);
-  cyanWash.target.position.set(0, 0, 0);
 
-  // 4. 카메라 정후면 상단에서 오는 보랏빛
   const purpleWash = new THREE.DirectionalLight("#e8d6ff", 0.3);
-  purpleWash.position.set(0, 50, 100);
+  purpleWash.userData.baseIntensity = 0.3;
+  purpleWash.position.set(0, 100, 100);
   group.add(purpleWash);
-  group.add(purpleWash.target);
-  purpleWash.target.position.set(0, 0, 0);
 
   return group;
 }

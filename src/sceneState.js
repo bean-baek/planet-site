@@ -37,11 +37,6 @@ function inverseLerp(a, b, v) {
   return Math.max(0, Math.min(1, (v - a) / (b - a)));
 }
 
-// Map progress into a sub-range, returning 0..1 within that window.
-function subRange(p, start, end) {
-  return Math.max(0, Math.min(1, (p - start) / (end - start)));
-}
-
 // ---- public API ----
 
 export function getState() {
@@ -148,13 +143,13 @@ export function applyTransitionFade(planet, rings, stars, glitter, bubbles, flow
   }
 
   // Compute per-layer fade (each mapped to its sub-range)
-  const starsFade = 1 - subRange(p, 0.0, 0.4);
-  const ringsFade = 1 - subRange(p, 0.0, 0.6);
-  const glitterFade = 1 - subRange(p, 0.0, 0.6);
-  const bubblesFade = 1 - subRange(p, 0.0, 0.5);
-  const flowersFade = 1 - subRange(p, 0.0, 0.6);
-  const petalsFade = 1 - subRange(p, 0.0, 0.6);
-  const planetFade = 1 - subRange(p, 0.5, 0.6);
+  const starsFade = 1 - inverseLerp(0.0, 0.4, p);
+  const ringsFade = 1 - inverseLerp(0.0, 0.6, p);
+  const glitterFade = 1 - inverseLerp(0.0, 0.6, p);
+  const bubblesFade = 1 - inverseLerp(0.0, 0.5, p);
+  const flowersFade = 1 - inverseLerp(0.0, 0.6, p);
+  const petalsFade = 1 - inverseLerp(0.0, 0.6, p);
+  const planetFade = 1 - inverseLerp(0.5, 0.6, p);
 
   // Stars
   stars.material.uniforms.uOpacity.value = baseOpacities.starsOpacity * starsFade;

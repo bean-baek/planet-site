@@ -186,3 +186,510 @@ body {
     bottom: var(--space-lg);
   }
 }
+
+/* ========================
+   BLUEPRINT / BRUTALIST UI
+   ======================== */
+
+.bp-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 11px;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+}
+
+/* --- Left column --- */
+
+.bp-left-col {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.86);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.bp-title-block {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.bp-title-main {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.16em;
+  margin-bottom: 5px;
+}
+
+.bp-title-sub {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.12em;
+}
+
+.bp-menu {
+  flex: 1;
+  overflow: hidden;
+}
+
+.bp-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.bp-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.bp-menu-btn.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.bp-menu-btn.is-clicked {
+  animation: bp-glitch 0.42s steps(1) forwards;
+}
+
+@keyframes bp-glitch {
+  0%   { background: rgba(191,230,255,0.22); color: #bfe6ff; transform: translateX(0); }
+  10%  { transform: translateX(3px); clip-path: inset(0 0 60% 0); }
+  20%  { transform: translateX(-2px); clip-path: inset(40% 0 0 0); background: rgba(255,255,255,0.28); }
+  30%  { transform: translateX(1px); clip-path: inset(0 0 0 0); color: #ffffff; }
+  50%  { transform: translateX(0); background: rgba(255,255,255,0.14); }
+  100% { transform: translateX(0); background: rgba(255,255,255,0.08); clip-path: none; }
+}
+
+.bp-menu-bullet {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.bp-menu-label {
+  flex: 1;
+}
+
+.bp-menu-meta {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.bp-footer {
+  padding: 16px 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  line-height: 1.9;
+}
+
+/* --- Right panel --- */
+
+.bp-right-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.86);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.bp-panel-head {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.bp-panel-head-main {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  margin-bottom: 5px;
+}
+
+.bp-panel-head-sub {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bp-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  scrollbar-width: none;
+}
+
+.bp-panel-body::-webkit-scrollbar {
+  display: none;
+}
+
+.bp-pane-title {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 18px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.bp-pane-title:first-child {
+  margin-top: 0;
+}
+
+.bp-pane-block {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bp-kv {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+}
+
+.bp-kv span {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bp-kv b {
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.bp-pane-code {
+  font-size: 9px;
+  line-height: 1.85;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.bp-pane-log {
+  font-size: 9px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.38);
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/* --- Graphs --- */
+
+.bp-graphs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.bp-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bp-graph-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bp-graph-value {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.bp-graph svg {
+  width: 100%;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.03);
+  display: block;
+}
+
+/* --- Explore button (bottom-right, above right panel) --- */
+
+.bp-explore-btn {
+  position: absolute;
+  bottom: 40px;
+  right: 280px; /* clear of the 260px right panel */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 26px;
+  background: #ffffff;
+  border: none;
+  color: #050505;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  white-space: nowrap;
+}
+
+.bp-explore-btn:hover {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.bp-explore-btn.visible {
+  opacity: 1;
+}
+
+.bp-explore-arrow {
+  font-size: 14px;
+}
+
+/* Planet hover hint shown in focus mode */
+.bp-planet-hint {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bp-planet-hint.visible {
+  opacity: 1;
+}
+
+/* --- World-space annotations --- */
+
+.bp-annotations {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+}
+
+.bp-anno {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  will-change: transform;
+}
+
+/* --- Tethered labels --- */
+
+.bp-labels-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bp-labels-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bp-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 155px;
+  max-width: 215px;
+  pointer-events: none;
+}
+
+.bp-label-head {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.14em;
+  color: #ffffff;
+  margin-bottom: 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.bp-label-line {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.75;
+}
+
+/* ─── Brutalist Planet Window ──────────────────────────────────────────── */
+
+.bp-pw-root {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.bp-pw-panel {
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  width: 580px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  animation: bp-pw-in 0.22s ease;
+}
+
+@keyframes bp-pw-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bp-pw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bp-pw-header-id {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.22em;
+  color: #ffffff;
+}
+
+.bp-pw-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+.bp-pw-close:hover { color: #ffffff; }
+
+.bp-pw-body {
+  display: flex;
+  gap: 0;
+}
+
+.bp-pw-left {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.bp-pw-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.bp-pw-key {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bp-pw-val {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.bp-pw-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bp-pw-divider {
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.2);
+  padding: 14px 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.bp-pw-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.bp-pw-canvas-wrap {
+  position: relative;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.2s;
+}
+.bp-pw-canvas-wrap:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.bp-pw-canvas {
+  display: block;
+  width: 260px;
+  height: 260px;
+}
+
+.bp-pw-canvas-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
