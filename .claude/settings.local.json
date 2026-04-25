@@ -5,7 +5,8 @@
       "Bash(ls -la flower-separate*)",
       "Bash(du -sh flower-separate*)",
       "Bash(ls -la *.png *.jpg *.jpeg *.ktx2 *.webp)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(npm run *)"
     ]
   }
 }
