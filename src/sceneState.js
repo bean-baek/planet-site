@@ -62,7 +62,7 @@ export function captureAtmosphere(scene, bloomPass, ambientLight) {
 }
 
 // Landscape target atmosphere
-const LANDSCAPE_SKY = new THREE.Color("#5a8a9a");
+const LANDSCAPE_SKY = new THREE.Color("#080c10");
 const LANDSCAPE_FOG_NEAR = 8;
 const LANDSCAPE_FOG_FAR = 50;
 const LANDSCAPE_BLOOM_STRENGTH = 0.15;
@@ -72,7 +72,8 @@ const LANDSCAPE_AMBIENT_INTENSITY = 1.4; // 1.2 -> 1.4 초미세 상향
  * Call every frame with the current camera distance.
  */
 export function update(cameraDistance, delta) {
-  rawProgress = 1 - inverseLerp(TRANSITION_END, TRANSITION_START, cameraDistance);
+  rawProgress =
+    1 - inverseLerp(TRANSITION_END, TRANSITION_START, cameraDistance);
 
   // Smooth toward raw target
   progress = THREE.MathUtils.damp(progress, rawProgress, DAMP_FACTOR, delta);
@@ -96,7 +97,15 @@ export function update(cameraDistance, delta) {
 /**
  * Capture base opacities from live objects (called once).
  */
-export function captureBaseOpacities(planet, rings, stars, glitter, bubbles, flowers, petals) {
+export function captureBaseOpacities(
+  planet,
+  rings,
+  stars,
+  glitter,
+  bubbles,
+  flowers,
+  petals,
+) {
   if (captured) return;
   captured = true;
 
@@ -114,7 +123,15 @@ export function captureBaseOpacities(planet, rings, stars, glitter, bubbles, flo
  * Apply transition fading to all orbital objects based on current progress.
  * Restores exact base values when progress === 0.
  */
-export function applyTransitionFade(planet, rings, stars, glitter, bubbles, flowers, petals) {
+export function applyTransitionFade(
+  planet,
+  rings,
+  stars,
+  glitter,
+  bubbles,
+  flowers,
+  petals,
+) {
   const p = progress;
 
   if (p === 0) {
@@ -152,7 +169,8 @@ export function applyTransitionFade(planet, rings, stars, glitter, bubbles, flow
   const planetFade = 1 - inverseLerp(0.5, 0.6, p);
 
   // Stars
-  stars.material.uniforms.uOpacity.value = baseOpacities.starsOpacity * starsFade;
+  stars.material.uniforms.uOpacity.value =
+    baseOpacities.starsOpacity * starsFade;
   stars.visible = starsFade > 0;
 
   // Rings
@@ -162,7 +180,8 @@ export function applyTransitionFade(planet, rings, stars, glitter, bubbles, flow
   });
 
   // Glitter
-  glitter.material.uniforms.uOpacity.value = baseOpacities.glitterOpacity * glitterFade;
+  glitter.material.uniforms.uOpacity.value =
+    baseOpacities.glitterOpacity * glitterFade;
   glitter.visible = glitterFade > 0;
 
   // Bubbles
@@ -198,19 +217,29 @@ export function applyAtmosphere(scene, bloomPass, ambientLight) {
   const p = progress;
 
   scene.background.copy(baseAtmosphere.bgColor).lerp(LANDSCAPE_SKY, p);
-  scene.fog.near = THREE.MathUtils.lerp(baseAtmosphere.fogNear, LANDSCAPE_FOG_NEAR, p);
-  scene.fog.far = THREE.MathUtils.lerp(baseAtmosphere.fogFar, LANDSCAPE_FOG_FAR, p);
-  
+  scene.fog.near = THREE.MathUtils.lerp(
+    baseAtmosphere.fogNear,
+    LANDSCAPE_FOG_NEAR,
+    p,
+  );
+  scene.fog.far = THREE.MathUtils.lerp(
+    baseAtmosphere.fogFar,
+    LANDSCAPE_FOG_FAR,
+    p,
+  );
+
   // Create a transition glow peak (dreamy pass-through effect)
   // Shift peak to the very end and make it explode, then vanish at 1.0
-  const transitionGlow = Math.pow(p, 6.0) * 15.0; 
+  const transitionGlow = Math.pow(p, 6.0) * 15.0;
   const finalFade = THREE.MathUtils.smoothstep(p, 0.9, 1.0); // 0.9부터 1.0까지 0으로 수렴
-  
-  bloomPass.strength = THREE.MathUtils.lerp(
-    baseAtmosphere.bloomStrength,
-    LANDSCAPE_BLOOM_STRENGTH,
-    p,
-  ) + (transitionGlow * (1.0 - finalFade));
+
+  bloomPass.strength =
+    THREE.MathUtils.lerp(
+      baseAtmosphere.bloomStrength,
+      LANDSCAPE_BLOOM_STRENGTH,
+      p,
+    ) +
+    transitionGlow * (1.0 - finalFade);
 
   ambientLight.intensity = THREE.MathUtils.lerp(
     baseAtmosphere.ambientIntensity,

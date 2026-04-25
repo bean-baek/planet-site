@@ -130,7 +130,7 @@ function returnToBlueprint() {
   controls.maxPolarAngle = Math.PI;
 
   // Camera snap back to default orbital position
-  camera.position.set(0, 0.4, 5);
+  camera.position.set(0, 0.4, 7);
   camera.lookAt(0, 0, 0);
 
   // Clean up landscape so it recreates fresh next entry

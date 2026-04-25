@@ -6,11 +6,12 @@ let viewport = { w: 1, h: 1 };
 export function createBlueprintScene() {
   if (bpScene) return bpScene;
   bpScene = new THREE.Scene();
-  bpScene.background = new THREE.Color(0x050505);
-  bpScene.fog = new THREE.FogExp2(0x050505, 0.055);
+  bpScene.background = new THREE.Color(0x0c1014);
+  bpScene.fog = new THREE.FogExp2(0x0c1014, 0.055);
 
   const ambient = new THREE.AmbientLight(0xffffff, 1.0);
-  bpScene.add(ambient);
+  const hemi = new THREE.HemisphereLight(0xe8d6ff, 0x060c10, 0.14);
+  bpScene.add(ambient, hemi);
 
   return bpScene;
 }

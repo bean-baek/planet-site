@@ -18,7 +18,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 // --- 2. Scene & Environment ---
 export const scene = new THREE.Scene();
-const HAZE_COLOR = new THREE.Color("#355865"); // muted grey-teal — airy, not cyan, matches reference atmospheric haze
+const HAZE_COLOR = new THREE.Color("#121212"); // muted grey-teal — airy, not cyan, matches reference atmospheric haze
 scene.background = HAZE_COLOR;
 scene.fog = new THREE.Fog(HAZE_COLOR, 4, 14);
 
@@ -29,7 +29,7 @@ export const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(0, 0.4, 5);
+camera.position.set(0, 0.4, 7);
 camera.lookAt(0, 0, 0);
 
 // --- 4. Lights ---

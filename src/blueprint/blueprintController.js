@@ -142,7 +142,7 @@ export function startBlueprint(onComplete) {
   document.getElementById("bp-overlay")?.remove();
   overlayEl = document.createElement("div");
   overlayEl.id = "bp-overlay";
-  overlayEl.style.cssText = "position:fixed;inset:0;z-index:20;background:#050505;opacity:0;pointer-events:none;transition:none;";
+  overlayEl.style.cssText = "position:fixed;inset:0;z-index:20;background:#0c1014;opacity:0;pointer-events:none;transition:none;";
   document.body.appendChild(overlayEl);
 
   const removeModeListener = onModeChange((next) => {
