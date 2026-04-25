@@ -2,7 +2,7 @@ import * as THREE from "three";
 import "./style.css";
 import { scene, camera, renderer } from "./scene.js";
 import { loadTextures } from "./loader.js";
-import { createPlanet, disposePlanet } from "./planet.js";
+import { createPlanet, disposePlanet, AURORA } from "./planet.js";
 import { createRings, disposeRings } from "./rings.js";
 import { stars, disposeStars } from "./stars.js";
 import { glitter, disposeGlitter } from "./glitter.js";
@@ -25,7 +25,14 @@ import { startBlueprint } from "./blueprint/blueprintController.js";
 
 const assets = await loadTextures();
 
-const planet = createPlanet(assets);
+const planet = createPlanet({
+  ...AURORA,
+  textures: {
+    albedo: assets.sphereAlbedo,
+    normal: assets.sphereNormal,
+    roughness: assets.sphereRoughness,
+  },
+});
 const rings = createRings();
 const flowers = await createFlowers();
 const astrophage = createAstrophage();
