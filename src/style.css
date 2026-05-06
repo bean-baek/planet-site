@@ -551,95 +551,125 @@ body {
   line-height: 1.75;
 }
 
-/* ─── Brutalist Planet Window ──────────────────────────────────────────── */
+/* ─── Planet Window ──────────────────────────────────────────────────────── */
 
 .bp-pw-root {
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Courier New", Courier, monospace;
+  animation: bp-root-in 0.3s ease forwards;
+}
+@keyframes bp-root-in {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.6); }
 }
 
 .bp-pw-panel {
   background: #080c10;
   border: 1px solid rgba(200, 228, 255, 0.14);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.72);
   width: 580px;
   max-width: 95vw;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: bp-pw-in 0.22s ease;
+  animation: bp-pw-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: width 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s;
+  will-change: transform, opacity;
 }
-
 @keyframes bp-pw-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: scale(0.93) translateY(18px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
+/* ── Header ── */
 .bp-pw-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 9, 14, 0.9);
 }
 
 .bp-pw-header-id {
   font-size: 11px;
   font-weight: bold;
   letter-spacing: 0.22em;
+  color: rgba(200, 228, 255, 0.9);
+}
+
+.bp-pw-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bp-pw-enter {
+  background: none;
+  border: 1px solid rgba(200, 228, 255, 0.28);
+  color: rgba(200, 228, 255, 0.65);
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 3px 10px;
+  letter-spacing: 0.14em;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.bp-pw-enter:hover {
   color: #ffffff;
+  border-color: rgba(200, 228, 255, 0.7);
+  background: rgba(200, 228, 255, 0.06);
 }
 
 .bp-pw-close {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.28);
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
   padding: 2px 6px;
-  letter-spacing: 0.05em;
   transition: color 0.15s;
 }
-.bp-pw-close:hover { color: #ffffff; }
+.bp-pw-close:hover { color: rgba(255, 100, 100, 0.9); }
 
-.bp-pw-body {
-  display: flex;
-  gap: 0;
-}
+/* ── Body split ── */
+.bp-pw-body { display: flex; }
 
 .bp-pw-left {
   flex: 1;
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-y: auto;
+  max-height: 360px;
 }
 
 .bp-pw-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 7px 0;
+  padding: 6px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   font-size: 9px;
   letter-spacing: 0.08em;
 }
 
-.bp-pw-key {
-  color: rgba(255, 255, 255, 0.35);
-}
+.bp-pw-key  { color: rgba(255, 255, 255, 0.32); }
 
 .bp-pw-val {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .bp-pw-dot {
@@ -653,33 +683,68 @@ body {
 .bp-pw-divider {
   font-size: 8px;
   letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.2);
-  padding: 14px 0 8px;
+  color: rgba(200, 228, 255, 0.2);
+  padding: 12px 0 7px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
+/* ── Right panel — viewport canvas ── */
 .bp-pw-right {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background: rgba(4, 8, 14, 0.6);
 }
 
 .bp-pw-canvas-wrap {
   position: relative;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: border-color 0.2s;
+  width: 280px;
+  height: 280px;
+  flex-shrink: 0;
 }
-.bp-pw-canvas-wrap:hover {
-  border-color: rgba(255, 255, 255, 0.4);
+
+/* Blueprint viewport corner brackets */
+.bp-pw-vp-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bp-pw-vp-c {
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(180, 220, 255, 0.5);
+  transition: width 0.2s, height 0.2s, border-color 0.2s;
+}
+.bp-pw-canvas-wrap:hover .bp-pw-vp-c {
+  width: 22px;
+  height: 22px;
+  border-color: rgba(200, 228, 255, 0.95);
+}
+.bp-pw-vp-c.tl { top: 0;    left: 0;    border-right: none;  border-bottom: none; }
+.bp-pw-vp-c.tr { top: 0;    right: 0;   border-left: none;   border-bottom: none; }
+.bp-pw-vp-c.bl { bottom: 0; left: 0;    border-right: none;  border-top: none; }
+.bp-pw-vp-c.br { bottom: 0; right: 0;   border-left: none;   border-top: none; }
+
+.bp-pw-vp-label {
+  position: absolute;
+  top: 6px;
+  right: 24px;
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  color: rgba(180, 220, 255, 0.35);
 }
 
 .bp-pw-canvas {
   display: block;
-  width: 260px;
-  height: 260px;
+  width: 100%;
+  height: 100%;
 }
 
 .bp-pw-canvas-hint {
@@ -689,7 +754,245 @@ body {
   right: 0;
   text-align: center;
   font-size: 8px;
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.2);
   pointer-events: none;
+  transition: color 0.2s;
 }
+.bp-pw-canvas-wrap:hover .bp-pw-canvas-hint { color: rgba(200, 228, 255, 0.6); }
+
+/* ── Maximize sequence — position/size managed via JS inline styles ── */
+.bp-pw-panel.is-maximizing,
+.bp-pw-panel.is-maximized {
+  max-width: none;
+  z-index: 35;
+  animation: none;
+  border-color: transparent;
+  overflow: hidden;
+}
+
+/* Header collapses out of layout so canvas gets full height */
+.bp-pw-panel.is-maximizing .bp-pw-header,
+.bp-pw-panel.is-maximized  .bp-pw-header {
+  height: 0;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: height 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+}
+
+/* Left collapses to 0 width — removes from flex flow so right gets 100% */
+.bp-pw-panel.is-maximizing .bp-pw-left,
+.bp-pw-panel.is-maximized  .bp-pw-left {
+  flex: 0 0 0;
+  min-width: 0;
+  max-width: 0;
+  overflow: hidden;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: flex 0.35s ease, opacity 0.25s ease;
+}
+
+/* Right fills the entire panel — stretch so canvas-wrap gets full height */
+.bp-pw-panel.is-maximizing .bp-pw-right,
+.bp-pw-panel.is-maximized  .bp-pw-right {
+  flex: 1;
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.bp-pw-panel.is-maximizing .bp-pw-canvas-wrap,
+.bp-pw-panel.is-maximized  .bp-pw-canvas-wrap {
+  width: 100%;
+  height: 100%;
+  border: none;
+  position: relative;
+}
+
+.bp-pw-panel.is-maximizing .bp-pw-vp-frame,
+.bp-pw-panel.is-maximized  .bp-pw-vp-frame {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.bp-pw-panel.is-maximizing .bp-pw-canvas-hint,
+.bp-pw-panel.is-maximized  .bp-pw-canvas-hint {
+  display: none;
+}
+
+.bp-pw-panel.is-maximizing .bp-pw-body,
+.bp-pw-panel.is-maximized  .bp-pw-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── Iridescent Backdrop (blurred blueprint snapshot) ───────────────────── */
+
+.bp-iri-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background-color: #0c1014;
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) brightness(0.38);
+  transform: scale(1.06); /* prevent blur edge artifacts */
+  animation: bp-iri-backdrop-in 0.4s ease forwards;
+}
+
+@keyframes bp-iri-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Iridescent Window Frame ─────────────────────────────────────────────── */
+
+.bp-iri-window {
+  position: fixed;
+  /* size/position set via JS inline styles */
+  z-index: 50;
+  pointer-events: none;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  box-sizing: border-box;
+  border: 1px solid rgba(200, 228, 255, 0.2);
+  animation: bp-iri-win-in 0.4s ease;
+}
+
+.bp-iri-window.is-fullscreen {
+  border: none;
+}
+
+@keyframes bp-iri-win-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Titlebar ── */
+.bp-iri-titlebar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 14px;
+  background: rgba(8, 12, 16, 0.88);
+  border-bottom: 1px solid rgba(200, 228, 255, 0.16);
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+/* Fullscreen: hide info text, keep only control buttons */
+.bp-iri-window.is-fullscreen .bp-iri-titlebar {
+  background: transparent;
+  border-bottom: none;
+  justify-content: flex-end;
+}
+.bp-iri-window.is-fullscreen .bp-iri-titlebar-glyph,
+.bp-iri-window.is-fullscreen .bp-iri-titlebar-name,
+.bp-iri-window.is-fullscreen .bp-iri-titlebar-sep,
+.bp-iri-window.is-fullscreen .bp-iri-titlebar-sub,
+.bp-iri-window.is-fullscreen .bp-iri-titlebar-meta { display: none; }
+
+.bp-iri-titlebar-glyph {
+  color: rgba(200, 228, 255, 0.7);
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.bp-iri-titlebar-name {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #ffffff;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.bp-iri-titlebar-sep {
+  color: rgba(200, 228, 255, 0.22);
+  flex-shrink: 0;
+}
+
+.bp-iri-titlebar-sub {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: rgba(200, 228, 255, 0.42);
+  flex-shrink: 0;
+}
+
+.bp-iri-titlebar-meta {
+  flex: 1;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.28);
+  text-align: right;
+  padding-right: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.bp-iri-titlebar-fs,
+.bp-iri-titlebar-close {
+  background: none;
+  border: 1px solid rgba(200, 228, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  font-family: inherit;
+  font-size: 10px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  pointer-events: auto;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.bp-iri-titlebar-fs:hover,
+.bp-iri-titlebar-close:hover {
+  color: #ffffff;
+  border-color: rgba(200, 228, 255, 0.7);
+  background: rgba(200, 228, 255, 0.07);
+}
+
+/* ── Corner ticks ── */
+.bp-iri-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(200, 228, 255, 0.28);
+  border-style: solid;
+  border-width: 0;
+}
+
+.bp-iri-corner.tl { top: 42px;    left: 8px;    border-top-width: 1px;    border-left-width: 1px; }
+.bp-iri-corner.tr { top: 42px;    right: 8px;   border-top-width: 1px;    border-right-width: 1px; }
+.bp-iri-corner.bl { bottom: 40px; left: 8px;    border-bottom-width: 1px; border-left-width: 1px; }
+.bp-iri-corner.br { bottom: 40px; right: 8px;   border-bottom-width: 1px; border-right-width: 1px; }
+
+.bp-iri-window.is-fullscreen .bp-iri-corner { display: none; }
+
+/* ── Status bar ── */
+.bp-iri-statusbar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 16, 0.75);
+  border-top: 1px solid rgba(200, 228, 255, 0.1);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: rgba(200, 228, 255, 0.32);
+}
+
+.bp-iri-window.is-fullscreen .bp-iri-statusbar { display: none; }

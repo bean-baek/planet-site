@@ -4,7 +4,7 @@ import {
   createBlueprintScene,
   getBlueprintScene,
   setViewport,
-  disposeBlueprintScene,
+  deferDisposeBlueprintScene,
 } from "./blueprintScene.js";
 import { createIrisPlanet, updateIrisResolution, clearIrisMats } from "./blueprintIris.js";
 import { createDiscNode, updateNodesResolution, clearNodeMats } from "./blueprintNodes.js";
@@ -40,7 +40,7 @@ import {
 } from "./blueprintUI.js";
 import { initLabels, setFocusLabels, clearLabels, updateLabels } from "./blueprintLabels.js";
 import { pushSample, renderGraphs, ensureGraphsInDOM } from "./blueprintGraphs.js";
-import { openPlanetWindow, closePlanetWindow } from "./blueprintPlanetWindow.js";
+import { openPlanetWindow, closePlanetWindow, forceClosePlanetWindow } from "./blueprintPlanetWindow.js";
 import {
   getMode,
   setMode,
@@ -72,22 +72,25 @@ let bpNodes = [];
 let ringsGroup = null;
 let rafId = null;
 let completeCb = null;
+let mountIridescentFn = null;
 let running = false;
 let lastTime = 0;
 let overlayEl = null;
 let lastFocusedNode = null;
 let hoveredPlanet = null;
+let _removeModeListener = null;
 
 const cameraLookAt = new THREE.Vector3(0, 0, 0);
 const cameraTarget = new THREE.Vector3(0, 0, Z_DEFAULT);
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-export function startBlueprint(onComplete) {
+export function startBlueprint(onComplete, mountIridescent) {
   // Always reset mode state so re-entry from iridescent starts clean
   resetModeState();
 
-  completeCb = onComplete;
+  completeCb        = onComplete;
+  mountIridescentFn = mountIridescent ?? null;
   running = true;
   lastFocusedNode = null;
   hoveredPlanet = null;
@@ -96,6 +99,10 @@ export function startBlueprint(onComplete) {
 
   const w = window.innerWidth;
   const h = window.innerHeight;
+
+  // Ensure renderer draws at full screen resolution — it may have been left at
+  // the smaller windowed iridescent size after returning from planet view.
+  renderer.setSize(w, h);
 
   const bpScene = createBlueprintScene();
   setViewport(w, h);
@@ -145,9 +152,10 @@ export function startBlueprint(onComplete) {
   overlayEl.style.cssText = "position:fixed;inset:0;z-index:20;background:#0c1014;opacity:0;pointer-events:none;transition:none;";
   document.body.appendChild(overlayEl);
 
-  const removeModeListener = onModeChange((next) => {
+  _removeModeListener = onModeChange((next) => {
     if (next === IRIDESCENT) {
-      removeModeListener();
+      _removeModeListener?.();
+      _removeModeListener = null;
       stopBlueprint();
       completeCb?.();
     }
@@ -272,7 +280,9 @@ function applyFocusAnimation(focusedNode, fp, delta) {
 
 function getHitObjects() {
   raycaster.setFromCamera(mouse, bpCamera);
-  return raycaster.intersectObjects(bpNodes, true);
+  // Filter to Mesh only — THREE.Line has a default threshold of 1 world-unit
+  // which intercepts clicks hundreds of pixels away from glyph/tick lines.
+  return raycaster.intersectObjects(bpNodes, true).filter(h => h.object.isMesh);
 }
 
 function onMouseMove(e) {
@@ -347,13 +357,18 @@ function onClick(e) {
     // inner disc sits in front — normalise to outer disc
     if (obj.userData.isInnerDisc) {
       obj = obj.parent?.children.find((c) => c.userData.isPlanet) ?? obj;
+    } else if (!obj.userData.isPlanet) {
+      // Satellite dot or other non-disc mesh — try parent pivot for sibling disc
+      const disc = obj.parent?.parent?.children?.find((c) => c.userData.isPlanet);
+      if (disc) obj = disc;
     }
     if (obj.userData.isPlanet) {
-      openPlanetWindow(obj, () => {
-        setMode(BLUEPRINT_TO_IRIDESCENT);
+      openPlanetWindow(obj, {
+        onEnter: () => setMode(BLUEPRINT_TO_IRIDESCENT),
+        mountIridescent: mountIridescentFn,
       });
     } else {
-      // Clicked non-planet part of iris → back to IDLE
+      // Clicked iris background (backing mesh etc.) → back to IDLE
       returnToIdle();
     }
   }
@@ -445,10 +460,13 @@ function loop() {
 
 // ─── Cleanup ───────────────────────────────────────────────────────────────
 
-function stopBlueprint() {
+function stopBlueprint(closeWindow = true) {
   running = false;
   if (rafId) cancelAnimationFrame(rafId);
   rafId = null;
+
+  _removeModeListener?.();
+  _removeModeListener = null;
 
   window.removeEventListener("mousemove", onMouseMove);
   window.removeEventListener("click", onClick);
@@ -456,11 +474,13 @@ function stopBlueprint() {
 
   document.body.style.cursor = "";
   clearLabels?.();
-  closePlanetWindow();
+  if (closeWindow) forceClosePlanetWindow();
 
   unmountBlueprintUI();
   unmountAnnotationLayer();
-  disposeBlueprintScene();
+  // Defer GPU disposal to next frame — RAF is cancelled so nothing renders.
+  // Keeps the JS thread free so the popup appears without stutter.
+  deferDisposeBlueprintScene();
   clearIrisMats();
   clearNodeMats();
   clearRingMats();
@@ -472,3 +492,11 @@ function stopBlueprint() {
   overlayEl?.remove();
   overlayEl = null;
 }
+
+// Stops blueprint cleanly without destroying the planet window DOM.
+// Used when iridescent mounts inside the expanding planet window.
+export function abortBlueprint() {
+  stopBlueprint(false);
+}
+
+export function getBpCamera() { return bpCamera; }

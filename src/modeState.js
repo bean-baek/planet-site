@@ -96,4 +96,5 @@ export function resetModeState() {
   rawFocus = 0;
   dissolveProgress = 0;
   dissolveElapsed = 0;
+  listeners.clear();
 }

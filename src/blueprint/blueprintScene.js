@@ -40,3 +40,18 @@ export function disposeBlueprintScene() {
   });
   bpScene = null;
 }
+
+export function deferDisposeBlueprintScene() {
+  const scene = bpScene;
+  bpScene = null; // release reference immediately so createBlueprintScene() can start fresh
+  if (!scene) return;
+  requestAnimationFrame(() => {
+    scene.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        mats.forEach((m) => m.dispose?.());
+      }
+    });
+  });
+}
