@@ -1,2 +1,7 @@
 node_modules/
 dist/
+
+# Claude Code session-local artifacts
+.claude/plans/
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
