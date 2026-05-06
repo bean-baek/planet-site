@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Line2 } from "three/addons/lines/Line2.js";
-import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { makeLineMat } from "./blueprintMaterials.js";
 
 const allNodeMats = [];
 
@@ -16,15 +16,7 @@ function arcPositions(radius, startAngle, endAngle, segments) {
 }
 
 function makeMat(linewidth, opacity) {
-  const mat = new LineMaterial({
-    color: 0xffffff,
-    linewidth,
-    transparent: true,
-    opacity,
-  });
-  mat.resolution.set(window.innerWidth, window.innerHeight);
-  allNodeMats.push(mat);
-  return mat;
+  return makeLineMat(linewidth, opacity, allNodeMats);
 }
 
 function makeLine({ radius, startAngle = 0, endAngle = Math.PI * 2, linewidth = 1, opacity = 1, segments = 64 }) {

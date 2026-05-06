@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Line2 } from "three/addons/lines/Line2.js";
-import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { makeLineMat } from "./blueprintMaterials.js";
 
 const allRingMats = [];
 
@@ -52,14 +52,7 @@ export function createBlueprintRings({ count = 32, seed = 42 } = {}) {
     const weight = 0.5 + Math.pow(rand(), 2) * 2.0;
     const opacity = 0.25 + rand() * 0.55;
 
-    const mat = new LineMaterial({
-      color: 0xffffff,
-      linewidth: weight,
-      transparent: true,
-      opacity,
-    });
-    mat.resolution.set(window.innerWidth, window.innerHeight);
-    allRingMats.push(mat);
+    const mat = makeLineMat(weight, opacity, allRingMats);
     lineMaterials.push(mat);
 
     const line = new Line2(geom, mat);

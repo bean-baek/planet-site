@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Line2 } from "three/addons/lines/Line2.js";
-import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { makeLineMat } from "./blueprintMaterials.js";
 
 // Module-level material tracking so updateIrisResolution actually updates them
 const allIrisMats = [];
@@ -25,17 +25,7 @@ function seeded(seed) {
 }
 
 function makeMat(linewidth, opacity) {
-  const mat = new LineMaterial({
-    color: 0xffffff,
-    linewidth,
-    transparent: true,
-    opacity,
-    worldUnits: false,
-    dashed: false,
-  });
-  mat.resolution.set(window.innerWidth, window.innerHeight);
-  allIrisMats.push(mat);
-  return mat;
+  return makeLineMat(linewidth, opacity, allIrisMats);
 }
 
 export function createIrisPlanet({ id = "ALPHA", position = new THREE.Vector3(), scale = 1, seed = 1 } = {}) {
